@@ -1,0 +1,11 @@
+JON
+playerName=jon
+score=0
+lives=5
+correctDirectionsNeeded=2
+maxRooms=4
+roomScore=500
+roomNumber=2
+correctDirectionChoices=1
+overallDirectionChoice=north
+directionChoice=north

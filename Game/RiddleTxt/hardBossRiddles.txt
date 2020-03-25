@@ -1,0 +1,11 @@
+﻿water|Drink
+rain|Drop
+snow|Flurry
+ice|Tundra
+window|What invention lets you look right through a wall?
+bottle|What has a neck but no head?
+age|What goes up but never comes down?
+fish|Alive without breath, As cold as death; Never thirsty, ever drinking, All in mail never clinking.
+wind|Voiceless it cries, Wingless flutters, Toothless bites, Mouthless mutters.
+eggses|A box without hinges, key, or lid, Yet golden treasure inside is hid.
+mountain|What has roots as nobody sees, Is taller than trees. Up, up, up it goes, And yet never grows?

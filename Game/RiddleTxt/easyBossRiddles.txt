@@ -1,0 +1,4 @@
+﻿water|Drink
+rain|Drop
+snow|Flurry
+ice|Tundra

@@ -1,0 +1,4 @@
+﻿water|It's Wet
+rain|It falls from the sky
+snow|It's cold and flakey
+ice|It's frozen

@@ -9,14 +9,22 @@ namespace Game
 {
     public class Game
     {
-        public readonly RiddleRepository _minionRiddles = new RiddleRepository();
-        public readonly RiddleRepository _bossRiddles = new RiddleRepository();
-        public readonly List<int> _usedMinionRiddles = new List<int>();
-        public readonly List<int> _usedBossRiddles = new List<int>();
-        public string _gameTitle = "the DUNGEON";
+        private readonly RiddleRepository _minionRiddles = new RiddleRepository();
+        private readonly RiddleRepository _bossRiddles = new RiddleRepository();
+        private readonly List<int> _usedMinionRiddles = new List<int>();
+        private readonly List<int> _usedBossRiddles = new List<int>();
+        private string _gameTitle = "the DUNGEON";
+        private Inventory _inventory = new Inventory();
+        private readonly WeaponRepository _weaponRepo = new WeaponRepository();
+        private readonly ArmorRepository _armorRepo = new ArmorRepository();
+        private readonly PotionRepository _potionRepo = new PotionRepository();
+
 
         public void Run()
         {
+            _weaponRepo.SeedItems();
+            _armorRepo.SeedItems();
+            _potionRepo.SeedItems();
             // Game Title Screen
             string[] title = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\Title.txt");
             foreach (string line in title)
@@ -52,6 +60,7 @@ namespace Game
                     break;
                 case "3":
                 case "how to play":
+                    Instructions();
                     break;
                 case "4":
                 case "high scores":
@@ -65,32 +74,27 @@ namespace Game
                     break;
             }
         }
-
+        public void Instructions()
+        {
+            Console.Clear();
+            Console.WriteLine($"Welcome to {_gameTitle}. The goal of the game is to travel through the dungeon, one room at a time.\n" +
+                $"In each room, you may find a minion, a boss monster, or may find some respite in an empty room.\n" +
+                $"To defeat a monster, you must successfully complete a minigame. After which you will be awarded points and then may continue to another room.\n" +
+                $"Whenever you would enter a room or while you are in a mini-game, you may type 'inventory' to pull up your inventory and use an item you have found.\n" +
+                $"Your initial room choice is important, as the dungeon has three branches to it, a north branch, an east branch, and a west branch.\n" +
+                $"At the end of one of the branches is {_gameTitle}'s main boss. Defeat this boss to win the game and add your name to the high scores list!\n" +
+                $"If you fail to defeat a monster, you lose a life and attempt again. Too many fails and it's game over!\n" +
+                $"Your difficulty level determines the difficulty of each encounter, as well as the length of {_gameTitle}.\n\n" +
+                $"Do you have what it takes to defeat {_gameTitle}? Then what are you waiting for?");
+            Console.ReadLine();
+            RunMenu();
+        }
         public void SetNewGame()
         {
             Player newPlayer = new Player();
             newPlayer.PlayerName = " ";
 
-            while (newPlayer.PlayerName.Length == 1)
-            {
-                Console.WriteLine("Welcome! What is your name?");
-                newPlayer.PlayerName = Console.ReadLine().ToLower();
-
-                if (newPlayer.PlayerName.Length > 1 && newPlayer.PlayerName[0] != ' ')
-                {
-                    newPlayer.PlayerName = newPlayer.PlayerName.Substring(0, 1).ToUpper() + newPlayer.PlayerName.Substring(1).ToLower();
-                }
-                else if (newPlayer.PlayerName.Length == 1 && newPlayer.PlayerName[0] != ' ')
-                {
-                    newPlayer.PlayerName.ToUpper();
-                }
-                else
-                {
-                    newPlayer.PlayerName = " ";
-                }
-
-            }
-
+            newPlayer.GetPlayerName();
 
             Console.Clear();
 
@@ -141,7 +145,11 @@ namespace Game
                     if (roomScore == 25)
                     {
                         lives--;
-                        if (lives < 0) { Console.WriteLine("You fall back, regroup, and enter once more."); }
+                        if (lives < 0)
+                        {
+                            Console.WriteLine($"You have lost a life. You have {lives} lives remaining.\n" +
+                            $"You fall back, regroup, and enter once more.");
+                        }
                         roomScore = 0;
                     }
 
@@ -157,28 +165,79 @@ namespace Game
                             correctChoice = true;
                             Console.WriteLine("At the end of the room is a single door leading onward.\n" +
                                 "Press ENTER to continue through.");
-                            Console.ReadLine();
+                            string input = Console.ReadLine().ToLower();
+                            while (input == "inventory")
+                            {
+                                Console.Clear();
+                                IItem itemChoice = _inventory.InventoryMenu();
+                                if (itemChoice == null) { break; }
+
+                                if (itemChoice.Type == "Armor")
+                                {
+                                    lives++;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You equip your shield, granting you one extra life. You now have {lives} lives remaining.\n\n" +
+                                        $"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+
+                                else if (itemChoice.Name.Contains("Speed"))
+                                {
+                                    maxRooms--;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You drink the lightning charged Potion of Speed. You dash through the current room on to the next one.\n\n" +
+                                        $"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else if (itemChoice.Name.Contains("Foresight"))
+                                {
+                                    correctDirectionChoices++;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You drink the crystal clear Potion of Foresight. You are certain you are headed in the correct direction." +
+                                        $"{itemChoice.Name} has been removed from you inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else if (itemChoice.Name.Contains("Teleportation"))
+                                {
+                                    backToStart = true;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You drink the chaotic Potion of Teleportation. You find yourself back in the original room.\n\n" +
+                                        $"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else { Console.WriteLine("You cannot use that here."); Console.ReadLine(); Console.Clear(); }
+                                Console.WriteLine("At the end of the room is a single door leading onward.\n" +
+                                "Press ENTER to continue through.");
+                                input = Console.ReadLine().ToLower();
+                            }
                             Console.Clear();
                             // enter second room
-                            roomScore = EnterRoom(currentRoom.Description);
-                            Console.WriteLine("\n\nMake a selection:\n" +
-                                "1. Continue\n" +
-                                "2. Save\n");
-                            response = Console.ReadLine().ToLower();
-                            while (response != "1" && response != "continue" && response != "2" && response != "save")
+                            if (!backToStart)
                             {
-                                Console.WriteLine("I didn't understand. Please make a selection:");
+                                roomScore = EnterRoom(currentRoom.Description);
+                                Console.WriteLine("\n\nMake a selection:\n" +
+                                    "1. Continue\n" +
+                                    "2. Save\n");
                                 response = Console.ReadLine().ToLower();
+                                while (response != "1" && response != "continue" && response != "2" && response != "save")
+                                {
+                                    Console.WriteLine("I didn't understand. Please make a selection:");
+                                    response = Console.ReadLine().ToLower();
+                                }
+                                switch (response)
+                                {
+                                    case "2":
+                                    case "save":
+                                        SaveMenu(newPlayer, lives, correctDirectionsNeeded, maxRooms, roomScore,
+                                            roomNumber, correctDirectionChoices, overallDirectionChoice, directionChoice);
+                                        break;
+                                }
+                                Console.Clear();
                             }
-                            switch (response)
-                            {
-                                case "2":
-                                case "save":
-                                    SaveMenu(newPlayer, lives, correctDirectionsNeeded, maxRooms, roomScore,
-                                        roomNumber, correctDirectionChoices, overallDirectionChoice, directionChoice);
-                                    break;
-                            }
-                            Console.Clear();
                         }
 
                         // after second room
@@ -193,47 +252,102 @@ namespace Game
                                 $"Please make a selection.");
                             directionChoice = Console.ReadLine().ToLower();
                             // direction choice
-                            while (directionChoice != "north" && directionChoice != "south" && directionChoice != "east" && directionChoice != "west")
+                            while (directionChoice == "inventory")
                             {
-                                switch (directionChoice)
+                                Console.Clear();
+                                IItem itemChoice = _inventory.InventoryMenu();
+                                if (itemChoice == null) { break; }
+
+                                if (itemChoice.Type == "Armor")
                                 {
-                                    case "1":
-                                        directionChoice = nextDirection[0];
-                                        break;
+                                    lives++;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You equip your shield, granting you one extra life. You now have {lives} lives remaining.\n\n" +
+                                        $"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+
+                                else if (itemChoice.Name.Contains("Speed"))
+                                {
+                                    maxRooms--;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You drink the lightning charged Potion of Speed. You dash through the current room on to the next one.\n\n" +
+                                        $"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else if (itemChoice.Name.Contains("Foresight"))
+                                {
+                                    correctDirectionChoices++;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You drink the crystal clear Potion of Foresight. You are certain you are headed in the correct direction." +
+                                        $"{itemChoice.Name} has been removed from you inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else if (itemChoice.Name.Contains("Teleportation"))
+                                {
+                                    backToStart = true;
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"You drink the chaotic Potion of Teleportation. You find yourself back in the original room.\n\n" +
+                                        $"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else { Console.WriteLine("You cannot use that here."); Console.ReadLine(); Console.Clear(); }
+                                Console.WriteLine($"You see three doors in this room:\n" +
+                                $"1. A door to the {nextDirection[0]},\n" +
+                                $"2. A door to the {nextDirection[1]},\n" +
+                                $"3. A door to the {nextDirection[2]}\n\n" +
+                                $"Please make a selection.");
+                                directionChoice = Console.ReadLine().ToLower();
+                            }
+                            if (!backToStart)
+                            {
+
+                                while (directionChoice != "north" && directionChoice != "south" && directionChoice != "east" && directionChoice != "west")
+                                {
+                                    switch (directionChoice)
+                                    {
+                                        case "1":
+                                            directionChoice = nextDirection[0];
+                                            break;
+                                        case "2":
+                                            directionChoice = nextDirection[1];
+                                            break;
+                                        case "3":
+                                            directionChoice = nextDirection[2];
+                                            break;
+                                        default:
+                                            Console.WriteLine("I didn't understand. Please select which door you would like to walk through.");
+                                            directionChoice = Console.ReadLine().ToLower();
+                                            break;
+                                    }
+                                }
+                                Console.Clear();
+                                // enter rooms 3 until final
+                                correctChoice = currentRoom.SetActiveRoom(directionChoice, nextDirection);
+                                roomScore = EnterRoom(currentRoom.Description);
+                                Console.WriteLine("\n\nMake a selection:\n" +
+                                    "1. Continue\n" +
+                                    "2. Save\n");
+                                response = Console.ReadLine().ToLower();
+                                while (response != "1" && response != "continue" && response != "2" && response != "save")
+                                {
+                                    Console.WriteLine("I didn't understand. Please make a selection:");
+                                    response = Console.ReadLine().ToLower();
+                                }
+                                switch (response)
+                                {
                                     case "2":
-                                        directionChoice = nextDirection[1];
-                                        break;
-                                    case "3":
-                                        directionChoice = nextDirection[2];
-                                        break;
-                                    default:
-                                        Console.WriteLine("I didn't understand. Please select which door you would like to walk through.");
-                                        directionChoice = Console.ReadLine().ToLower();
+                                    case "save":
+                                        SaveMenu(newPlayer, lives, correctDirectionsNeeded, maxRooms, roomScore,
+                                            roomNumber, correctDirectionChoices, overallDirectionChoice, directionChoice);
                                         break;
                                 }
+                                Console.Clear();
                             }
-                            Console.Clear();
-                            // enter rooms 3 until final
-                            correctChoice = currentRoom.SetActiveRoom(directionChoice, nextDirection);
-                            roomScore = EnterRoom(currentRoom.Description);
-                            Console.WriteLine("\n\nMake a selection:\n" +
-                                "1. Continue\n" +
-                                "2. Save\n");
-                            response = Console.ReadLine().ToLower();
-                            while (response != "1" && response != "continue" && response != "2" && response != "save")
-                            {
-                                Console.WriteLine("I didn't understand. Please make a selection:");
-                                response = Console.ReadLine().ToLower();
-                            }
-                            switch (response)
-                            {
-                                case "2":
-                                case "save":
-                                    SaveMenu(newPlayer, lives, correctDirectionsNeeded, maxRooms, roomScore,
-                                        roomNumber, correctDirectionChoices, overallDirectionChoice, directionChoice);
-                                    break;
-                            }
-                            Console.Clear();
                         }
                         else
                         {
@@ -298,6 +412,58 @@ namespace Game
                     Console.WriteLine("Please select which door you would like to walk through.");
 
                     overallDirectionChoice = Console.ReadLine().ToLower();
+                    while (overallDirectionChoice == "inventory")
+                    {
+                        Console.Clear();
+                        IItem itemChoice = _inventory.InventoryMenu();
+                        if (itemChoice == null) { break; }
+                        if (itemChoice.Type == "Armor")
+                        {
+                            lives++;
+                            _inventory.RemoveItem(itemChoice);
+                            Console.WriteLine($"You equip your shield, granting you one extra life. You now have {lives} lives remaining.\n\n" +
+                                $"{itemChoice.Name} has been removed from your inventory.");
+                            Console.ReadLine();
+                            Console.Clear();
+                        }
+
+                        else if (itemChoice.Name.Contains("Speed"))
+                        {
+                            maxRooms--;
+                            _inventory.RemoveItem(itemChoice);
+                            Console.WriteLine($"You drink the lightning charged Potion of Speed. You dash through the current room on to the next one.\n\n" +
+                                $"{itemChoice.Name} has been removed from your inventory.");
+                            Console.ReadLine();
+                            Console.Clear();
+                        }
+                        else if (itemChoice.Name.Contains("Foresight"))
+                        {
+                            correctDirectionChoices++;
+                            _inventory.RemoveItem(itemChoice);
+                            Console.WriteLine($"You drink the crystal clear Potion of Foresight. You are certain you are headed in the correct direction." +
+                                $"{itemChoice.Name} has been removed from you inventory.");
+                            Console.ReadLine();
+                            Console.Clear();
+                        }
+                        else { Console.WriteLine("You cannot use that here."); Console.ReadLine(); Console.Clear(); }
+                        Console.WriteLine($"You are in an empty room.\n" +
+                        $"You see three doors in this room:\n" +
+                        $"1. A door to the north,\n" +
+                        $"2. A door to the east,\n" +
+                        $"3. A door to the west\n");
+
+                        if (startChoices.Count > 0)
+                        {
+                            Console.WriteLine("You have already tried the following doors:");
+                            foreach (string choice in startChoices)
+                            {
+                                Console.WriteLine(choice);
+                            }
+                        }
+                        Console.WriteLine("Please select which door you would like to walk through.");
+
+                        overallDirectionChoice = Console.ReadLine().ToLower();
+                    }
                     while (overallDirectionChoice != "north" && overallDirectionChoice != "east" && overallDirectionChoice != "west")
                     {
                         switch (overallDirectionChoice)
@@ -475,13 +641,13 @@ namespace Game
             }
         }
 
-        // Give description, initiate hangman game (if applicable), award item (if applicable).
+        // Give description, initiate mini game (if applicable), award item (if applicable).
         private int EnterRoom(string description)
         {
-            int roomScore;
+            int roomScore = 0;
             if (description == "final")
             {
-                Console.WriteLine("Something Something BIG BOSS!!");
+                Console.WriteLine($"You have made it to the end of {_gameTitle}!! Time to face your final test!!");
                 Riddle finalRiddle = GetRiddle(_bossRiddles, _usedBossRiddles);
                 Console.WriteLine(finalRiddle.Description);
                 roomScore = 10 * (Hangman(finalRiddle.Keyword));
@@ -490,14 +656,36 @@ namespace Game
             else if (description == "minion")
             {
                 Riddle currentRiddle = GetRiddle(_minionRiddles, _usedMinionRiddles);
-                Console.WriteLine(currentRiddle.Description);
-                roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
+                Random random = new Random();
+                int randomNumber = random.Next(1, 3);
+                switch (randomNumber)
+                {
+                    case 1:
+                        Console.WriteLine(currentRiddle.Description);
+                        roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
+                        break;
+                    case 2:
+                        TwentyOne newTwentyOne = new TwentyOne();
+                        roomScore = newTwentyOne.Run(_inventory);
+                        break;
+                }
             }
             else if (description == "boss")
             {
-                Riddle currentRiddle = GetRiddle(_bossRiddles, _usedBossRiddles);
-                Console.WriteLine(currentRiddle.Description);
-                roomScore = 2 * (Hangman(currentRiddle.Keyword)); // pass in keyword from method
+                Riddle currentRiddle = GetRiddle(_minionRiddles, _usedMinionRiddles);
+                Random random = new Random();
+                int randomNumber = random.Next(1, 3);
+                switch (randomNumber)
+                {
+                    case 1:
+                        Console.WriteLine(currentRiddle.Description);
+                        roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
+                        break;
+                    case 2:
+                        TwentyOne newTwentyOne = new TwentyOne();
+                        roomScore = newTwentyOne.Run(_inventory);
+                        break;
+                }
             }
             else
             {
@@ -511,19 +699,27 @@ namespace Game
                     string response = Console.ReadLine().ToLower();
                     while (response != "1" && response != "2")
                     {
-                        if(response.Contains("continue"))
+                        if (response.Contains("continue"))
                         {
                             response = "2";
                         }
-                        else if(response.Contains("inspect") || response.Contains("chest"))
+                        else if (response.Contains("inspect") || response.Contains("chest"))
                         {
                             response = "1";
                         }
                     }
-                    switch(response)
+                    switch (response)
                     {
                         case "1":
-                            GetRandomItem();
+                            IItem newItem = GetRandomItem();
+                            _inventory.AddToInventory(newItem);
+                            Console.Clear();
+                            Console.WriteLine($"You open the chest. Inside you find a {newItem.Name}!\n\n" +
+                                $"{"TYPE",-8}  --  { "NAME",-20}  --  { "DESCRIPTION",50}\n" +
+                                $"{newItem.Type,-8}  --  {newItem.Name,-20}  --  {newItem.Description,50}\n\n\n\n" +
+                                $"{newItem.Name} added to your inventory!\n\n" +
+                                $"Press ENTER to continue");
+                            Console.ReadLine();
                             break;
                     }
                     Console.Clear();
@@ -534,7 +730,27 @@ namespace Game
 
         public IItem GetRandomItem()
         {
-            IItem newItem = new Weapon();
+            IItem newItem;
+            Random randomNumber = new Random();
+            int itemNumber = randomNumber.Next(1, 4);
+            switch (itemNumber)
+            {
+                case 1:
+                    int weaponNumber = randomNumber.Next(_weaponRepo.GetCount());
+                    newItem = _weaponRepo.GetItemByIndex(weaponNumber);
+                    break;
+                case 2:
+                    int armorNumber = randomNumber.Next(_armorRepo.GetCount());
+                    newItem = _armorRepo.GetItemByIndex(armorNumber);
+                    break;
+                case 3:
+                    int potionNumber = randomNumber.Next(_potionRepo.GetCount());
+                    newItem = _potionRepo.GetItemByIndex(potionNumber);
+                    break;
+                default:
+                    newItem = new Weapon();
+                    break;
+            }
 
             return newItem;
         }
@@ -620,20 +836,73 @@ namespace Game
                             letterCount = keyword.Length;
                             Console.WriteLine("\n\n");
                             Console.Write("Enter a letter: ");
-                            letter = char.Parse(Console.ReadLine().ToLower());
-                            Console.Clear();
+                            string command = Console.ReadLine().ToLower();
+                            while (command == "inventory")
+                            {
+                                Console.Clear();
+                                IItem itemChoice = _inventory.InventoryMenu();
+                                if (itemChoice == null) 
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("\n\n");
+                                    Console.Write("Enter a letter: ");
+                                    command = Console.ReadLine().ToLower();
+                                    break; 
+                                }
 
-                            if (word.Contains(letter))
-                            {
-                                Console.WriteLine("Correct!\n\n");
-                                guessed[index] = letter;
-                                ++index;
+                                if (itemChoice.Type == "Weapon")
+                                {
+                                    if (itemChoice.Name.Contains("Epic"))
+                                    {
+                                        won = true;
+                                        Console.WriteLine("You brandish your weapon, allowing you to slay the monster and advance.");
+                                        Console.ReadLine();
+                                        Console.Clear();
+                                    }
+                                    else
+                                    {
+                                        incorrectGuesses--;
+                                        Console.WriteLine($"You brandish your weapon, giving you an extra attempt to solve the riddle. You have {5 - incorrectGuesses} remaining.");
+                                        Console.ReadLine();
+                                        Console.Clear();
+                                    }
+                                    _inventory.RemoveItem(itemChoice);
+                                    Console.WriteLine($"{itemChoice.Name} has been removed from your inventory.");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                else
+                                {
+                                    Console.WriteLine("You cannot use that here");
+                                    Console.ReadLine();
+                                    Console.Clear();
+                                }
+                                if (!won)
+                                {
+                                    Console.WriteLine("\n\n");
+                                    Console.Write("Enter a letter: ");
+                                    command = Console.ReadLine().ToLower();
+                                }
+                                else { command = ""; }
                             }
-                            else
+                            if (!won)
                             {
-                                Console.WriteLine("You guessed incorrectly!\n\n");
-                                ++incorrectGuesses;
-                                Console.WriteLine($"You have {5 - incorrectGuesses} tries remaining.\n\n");
+
+                                letter = char.Parse(command);
+                                Console.Clear();
+
+                                if (word.Contains(letter))
+                                {
+                                    Console.WriteLine("Correct!\n\n");
+                                    guessed[index] = letter;
+                                    ++index;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("You guessed incorrectly!\n\n");
+                                    ++incorrectGuesses;
+                                    Console.WriteLine($"You have {5 - incorrectGuesses} tries remaining.\n\n");
+                                }
                             }
                         }
 

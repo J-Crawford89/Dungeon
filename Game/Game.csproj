@@ -43,18 +43,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArmorRepository.cs" />
     <Compile Include="Clue.cs" />
     <Compile Include="Difficulty.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="IItem.cs" />
+    <Compile Include="IItemRepository.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="ItemClasses.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PotionRepository.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Riddle.cs" />
     <Compile Include="RiddleRepository.cs" />
     <Compile Include="Room.cs" />
+    <Compile Include="TwentyOne.cs" />
+    <Compile Include="WeaponRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -64,9 +69,9 @@
     <None Include="SaveGame\SaveOne.sav" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NewFile1.txt" />
-    <Content Include="NewFile2.txt" />
-    <Content Include="NewFile3.txt" />
+    <Content Include="Items\Armor.txt" />
+    <Content Include="Items\Potions.txt" />
+    <Content Include="Items\Weapons.txt" />
     <Content Include="RiddleTxt\easyBossRiddles.txt" />
     <Content Include="RiddleTxt\easyMinionRiddles.txt" />
     <Content Include="RiddleTxt\mediumBossRiddles.txt" />

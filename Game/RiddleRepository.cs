@@ -8,7 +8,7 @@ namespace Game
 {
     public class RiddleRepository
     {
-        public List<Riddle> _riddleRepo = new List<Riddle>();
+        private List<Riddle> _riddleRepo = new List<Riddle>();
         public void AddToRiddles(Riddle riddle)
         {
             _riddleRepo.Add(riddle);

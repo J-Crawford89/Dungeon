@@ -661,7 +661,8 @@ namespace Game
                 switch (randomNumber)
                 {
                     case 1:
-                        Console.WriteLine(currentRiddle.Description);
+                        Console.WriteLine($"A lone goblin is in this room. It looks at you and snarls.\n\n" +
+                            $"Here is your clue {currentRiddle.Description}");
                         roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
                         break;
                     case 2:
@@ -678,7 +679,8 @@ namespace Game
                 switch (randomNumber)
                 {
                     case 1:
-                        Console.WriteLine(currentRiddle.Description);
+                        Console.WriteLine($"A large goblin boss is in this room. It charges at you.\n\n" +
+                            $"Here is your clue {currentRiddle.Description}");
                         roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
                         break;
                     case 2:

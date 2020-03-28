@@ -13,7 +13,7 @@ namespace Game
         static void Main(string[] args)
         {
             Game newGame = new Game();
-            
+
             newGame.Run();
         }
     }

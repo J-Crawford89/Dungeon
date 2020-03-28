@@ -63,22 +63,50 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="HighScores.sav" />
-    <None Include="SaveGame\SaveThree.sav" />
-    <None Include="SaveGame\SaveTwo.sav" />
-    <None Include="SaveGame\SaveOne.sav" />
+    <None Include="HighScores.sav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SaveGame\SaveThree.sav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SaveGame\SaveTwo.sav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SaveGame\SaveOne.sav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Items\Armor.txt" />
-    <Content Include="Items\Potions.txt" />
-    <Content Include="Items\Weapons.txt" />
-    <Content Include="RiddleTxt\easyBossRiddles.txt" />
-    <Content Include="RiddleTxt\easyMinionRiddles.txt" />
-    <Content Include="RiddleTxt\mediumBossRiddles.txt" />
-    <Content Include="RiddleTxt\hardMinionRiddles.txt" />
-    <Content Include="RiddleTxt\hardBossRiddles.txt" />
-    <Content Include="RiddleTxt\mediumMinionRiddles.txt" />
-    <Content Include="Title.txt" />
+    <Content Include="Items\Armor.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Items\Potions.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Items\Weapons.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RiddleTxt\easyBossRiddles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RiddleTxt\easyMinionRiddles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RiddleTxt\mediumBossRiddles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RiddleTxt\hardMinionRiddles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RiddleTxt\hardBossRiddles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="RiddleTxt\mediumMinionRiddles.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Title.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

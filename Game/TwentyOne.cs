@@ -22,6 +22,7 @@ namespace Game
 
         public int Run(Inventory inventory)
         {
+            total = 0;
             houseScore = randomizeCards.Next(15, 22);
             userCards[0] = DealCards();
             userCards[1] = DealCards();
@@ -88,9 +89,14 @@ namespace Game
 
             if (hasWon)
             {
+                if (total == 21) { playerScore = 500; }
+                else if (rematchCount == 1) { playerScore = 500; }
+                else if (rematchCount == 2) { playerScore = 350; }
+                else if (rematchCount == 3) { playerScore = 250; }
                 Console.WriteLine("\n\n" +
                 "Congratulations! You have beaten the house!");
                 Console.WriteLine("Your score was: " + playerScore);
+                Console.ReadLine();
                 return playerScore;
             }
             else { return 25; }
@@ -136,6 +142,7 @@ namespace Game
                             total = 21; playerScore = 500; hasWon = true;
                             break;
                     }
+                    hasWon = true;
                     Console.WriteLine("\n You won. The house total " +
                         "is " + houseScore + ".\n Would you like to play again? y/n");
                     ReMatch();
@@ -211,9 +218,9 @@ namespace Game
                 "Your new total is " + total + ".");
             if (total.Equals(21))
             {
-                Console.WriteLine("\nYou have 21! The dealer's score is " + houseScore + ".\n" +
-                    "Play again? y/n");
-                ReMatch();
+                playerScore = 500;
+                Console.WriteLine("\nYou have 21! You win! The dealer's score is " + houseScore + ".\n");
+                Console.ReadLine();
             }
             else if (total > 21)
             {

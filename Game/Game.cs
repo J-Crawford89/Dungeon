@@ -26,7 +26,8 @@ namespace Game
             _armorRepo.SeedItems();
             _potionRepo.SeedItems();
             // Game Title Screen
-            string[] title = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\Title.txt");
+            
+            string[] title = System.IO.File.ReadAllLines(@"Title.txt");
             foreach (string line in title)
             { Console.WriteLine(line); }
             Console.ReadLine();
@@ -145,10 +146,12 @@ namespace Game
                     if (roomScore == 25)
                     {
                         lives--;
-                        if (lives < 0)
+                        if (lives > 0)
                         {
                             Console.WriteLine($"You have lost a life. You have {lives} lives remaining.\n" +
-                            $"You fall back, regroup, and enter once more.");
+                            $"You fall back, regroup, and press forward once more.");
+                            Console.ReadLine();
+                            Console.Clear();
                         }
                         roomScore = 0;
                     }
@@ -256,7 +259,16 @@ namespace Game
                             {
                                 Console.Clear();
                                 IItem itemChoice = _inventory.InventoryMenu();
-                                if (itemChoice == null) { break; }
+                                if (itemChoice == null) 
+                                {
+                                    Console.WriteLine($"You see three doors in this room:\n" +
+                                $"1. A door to the {nextDirection[0]},\n" +
+                                $"2. A door to the {nextDirection[1]},\n" +
+                                $"3. A door to the {nextDirection[2]}\n\n" +
+                                $"Please make a selection.");
+                                    directionChoice = Console.ReadLine().ToLower();
+                                    break; 
+                                }
 
                                 if (itemChoice.Type == "Armor")
                                 {
@@ -484,6 +496,8 @@ namespace Game
                         }
                     }
 
+                    directionChoice = overallDirectionChoice;
+
                     Console.Clear();
 
                     startChoices.Add(overallDirectionChoice);
@@ -513,8 +527,9 @@ namespace Game
                     Console.Clear();
                 }
             }
-            if (lives == 0)
+            if (lives == 0 || roomScore == 25)
             {
+                score += roomScore;
                 Console.WriteLine($"Your heroic adventures have come to an end.\n" +
                     $"The tale of {newPlayer.PlayerName} ends here.\n\n\n" +
                     $"GAME OVER");
@@ -529,7 +544,7 @@ namespace Game
             }
             Console.Clear();
             string highScore = $"{score.ToString()}|{newPlayer.PlayerName}";
-            System.IO.File.AppendAllText(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\HighScores.sav", $"{highScore}\n");
+            System.IO.File.AppendAllText(@"HighScores.sav", $"{highScore}\n");
 
             ShowHighScores();
 
@@ -553,8 +568,8 @@ namespace Game
             {
                 case "1":
                 case "easy":
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\easyMinionRiddles.txt"), _minionRiddles);
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\easyBossRiddles.txt"), _bossRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\easyMinionRiddles.txt"), _minionRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\easyBossRiddles.txt"), _bossRiddles);
                     lives = 5;
                     correctDirectionsNeeded = 2;
                     maxRooms = 4;
@@ -562,13 +577,13 @@ namespace Game
                 case "2":
                 case "medium":
                 default:
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\mediumMinionRiddles.txt"), _minionRiddles);
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\mediumBossRiddles.txt"), _bossRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\mediumMinionRiddles.txt"), _minionRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\mediumBossRiddles.txt"), _bossRiddles);
                     break;
                 case "3":
                 case "hard":
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\hardMinionRiddles.txt"), _minionRiddles);
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\hardBossRiddles.txt"), _bossRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"\RiddleTxt\hardMinionRiddles.txt"), _minionRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\hardBossRiddles.txt"), _bossRiddles);
                     lives = 1;
                     correctDirectionsNeeded = 5;
                     maxRooms = 10;
@@ -587,7 +602,7 @@ namespace Game
         {
             List<Player> highScores = new List<Player>();
 
-            string[] fromFile = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\HighScores.sav");
+            string[] fromFile = System.IO.File.ReadAllLines(@"HighScores.sav");
 
             foreach (string line in fromFile)
             {
@@ -662,7 +677,7 @@ namespace Game
                 {
                     case 1:
                         Console.WriteLine($"A lone goblin is in this room. It looks at you and snarls.\n\n" +
-                            $"Here is your clue {currentRiddle.Description}");
+                            $"Here is your clue:\n {currentRiddle.Description}");
                         roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
                         break;
                     case 2:
@@ -680,7 +695,7 @@ namespace Game
                 {
                     case 1:
                         Console.WriteLine($"A large goblin boss is in this room. It charges at you.\n\n" +
-                            $"Here is your clue {currentRiddle.Description}");
+                            $"Here is your clue:\n {currentRiddle.Description}");
                         roomScore = Hangman(currentRiddle.Keyword); // pass in keyword from method
                         break;
                     case 2:
@@ -717,8 +732,8 @@ namespace Game
                             _inventory.AddToInventory(newItem);
                             Console.Clear();
                             Console.WriteLine($"You open the chest. Inside you find a {newItem.Name}!\n\n" +
-                                $"{"TYPE",-8}  --  { "NAME",-20}  --  { "DESCRIPTION",50}\n" +
-                                $"{newItem.Type,-8}  --  {newItem.Name,-20}  --  {newItem.Description,50}\n\n\n\n" +
+                                $"{"TYPE",-8}  ||  { "NAME",-30}  ||  { "DESCRIPTION",60}\n" +
+                                $"{newItem.Type,-8}  ||  {newItem.Name,-30}  ||  {newItem.Description,60}\n\n\n\n" +
                                 $"{newItem.Name} added to your inventory!\n\n" +
                                 $"Press ENTER to continue");
                             Console.ReadLine();
@@ -947,9 +962,9 @@ namespace Game
                 $"directionChoice={directionChoice}"
             };
 
-            string saveOne = GetSaveName(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveOne.sav"));
-            string saveTwo = GetSaveName(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveTwo.sav"));
-            string saveThree = GetSaveName(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveThree.sav"));
+            string saveOne = GetSaveName(System.IO.File.ReadAllLines(@"SaveGame\SaveOne.sav"));
+            string saveTwo = GetSaveName(System.IO.File.ReadAllLines(@"SaveGame\SaveTwo.sav"));
+            string saveThree = GetSaveName(System.IO.File.ReadAllLines(@"SaveGame\SaveThree.sav"));
 
             Console.Clear();
             Console.WriteLine($"__________________________________________________________________________________________\n\n" +
@@ -977,7 +992,7 @@ namespace Game
                         if (saveName != null)
                         {
                             saveFile[0] = saveName;
-                            System.IO.File.WriteAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveOne.sav", saveFile);
+                            System.IO.File.WriteAllLines(@"SaveGame\SaveOne.sav", saveFile);
                             Console.WriteLine("\n\n SAVED");
                         }
                         break;
@@ -987,7 +1002,7 @@ namespace Game
                         if (saveName != null)
                         {
                             saveFile[0] = saveName;
-                            System.IO.File.WriteAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveTwo.sav", saveFile);
+                            System.IO.File.WriteAllLines(@"SaveGame\SaveTwo.sav", saveFile);
                             Console.WriteLine("\n\n SAVED");
                         }
                         break;
@@ -997,7 +1012,7 @@ namespace Game
                         if (saveName != null)
                         {
                             saveFile[0] = saveName;
-                            System.IO.File.WriteAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveThree.sav", saveFile);
+                            System.IO.File.WriteAllLines(@"SaveGame\SaveThree.sav", saveFile);
                             Console.WriteLine("\n\n SAVED");
                         }
                         break;
@@ -1047,9 +1062,9 @@ namespace Game
         }
         public void LoadGameMenu()
         {
-            string[] saveOne = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveOne.sav");
-            string[] saveTwo = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveTwo.sav");
-            string[] saveThree = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\SaveGame\SaveThree.sav");
+            string[] saveOne = System.IO.File.ReadAllLines(@"SaveGame\SaveOne.sav");
+            string[] saveTwo = System.IO.File.ReadAllLines(@"SaveGame\SaveTwo.sav");
+            string[] saveThree = System.IO.File.ReadAllLines(@"SaveGame\SaveThree.sav");
 
             Console.WriteLine($"__________________________________________________________________________________________\n\n" +
                 $"-------------------------------------LOAD GAME MENU---------------------------------------\n" +
@@ -1116,16 +1131,16 @@ namespace Game
             switch (difficulty)
             {
                 case 2:
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\easyMinionRiddles.txt"), _minionRiddles);
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\easyBossRiddles.txt"), _bossRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\easyMinionRiddles.txt"), _minionRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\easyBossRiddles.txt"), _bossRiddles);
                     break;
                 case 3:
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\mediumMinionRiddles.txt"), _minionRiddles);
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\mediumBossRiddles.txt"), _bossRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\mediumMinionRiddles.txt"), _minionRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\mediumBossRiddles.txt"), _bossRiddles);
                     break;
                 case 5:
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\hardMinionRiddles.txt"), _minionRiddles);
-                    SeedRiddles(System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\RiddleTxt\hardBossRiddles.txt"), _bossRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\hardMinionRiddles.txt"), _minionRiddles);
+                    SeedRiddles(System.IO.File.ReadAllLines(@"RiddleTxt\hardBossRiddles.txt"), _bossRiddles);
                     break;
             }
 

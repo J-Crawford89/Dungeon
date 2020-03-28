@@ -12,7 +12,7 @@ namespace Game
         private List<Potion> _potionRepo = new List<Potion>();
         public void SeedItems()
         {
-            string[] contentArray = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\Items\Weapons.txt");
+            string[] contentArray = System.IO.File.ReadAllLines(@"C:\Users\flyca\OneDrive\Documents\ELEVENFIFTY\DotNetFeb2020\C#\Game\Game\Items\Potions.txt");
             foreach (string content in contentArray)
             {
                 string[] splitContent = content.Split('|');

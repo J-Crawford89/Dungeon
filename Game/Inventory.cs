@@ -28,6 +28,7 @@ namespace Game
             Console.ReadLine();
             Console.WriteLine("Select the number of the item you wish to use.");
             string command = Console.ReadLine();
+            Console.Clear();
             try
             {
                 int inventoryItemNumber = Convert.ToInt32(command) - 1;

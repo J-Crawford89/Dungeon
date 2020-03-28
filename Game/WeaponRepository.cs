@@ -27,7 +27,7 @@ namespace Game
         }
         public IItem GetItemByIndex(int i)
         {
-            return _weaponRepo[i - 1];
+            return _weaponRepo[i];
         }
     }
 }
